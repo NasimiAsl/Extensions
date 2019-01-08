@@ -2251,4 +2251,209 @@ function cross(v, u) {
 })(this);
 
 
+
+		 BABYLONX.GeometryBuilder.EdgeRef = function (  ref) {
+            
+			var res = {r:ref , step:[]};
+				for(var i = 0;i< ref.i.length;i++){
+				res.step.push(i);
+				}
+				return res;
+				
+			}
+		  BABYLONX.GeometryBuilder.Edge = function (geo, l, p, path ,repeat  ) {
+
+            var path_pts = null;
+            if (path) {
+                if (!GB.cachePath) GB.cachePath = [];
+                if (path.d.indexOf('|') != -1) {
+                    var key = path.d.split('|')[0];
+                    path.d = path.d.split('|')[1];
+                    GB.cachePath[key] = path.d;
+                }
+                if (path.d.indexOf('=') == 0) {
+                    path.d = GB.cachePath[path.d.replace('=', '')];
+                }
+
+                path.d = def(path.d, "m 547.25,526.17859 c 0,0 -0.75,-28.06641 -21.25,-28.31641 -20.5,-0.25 -20.25,16.5 -20.25,16.5");
+                path.d2 = def(path.d2, "empty");
+                path.l = def(path.l, 0);
+                path.s = def(path.s, 100);
+                path.c = def(path.c, 100);
+
+                var key = JSON.stringify(path);
+
+                if (!GB.cache) GB.cache = [];
+
+                if (GB.cache[key]) path_pts = GB.cache[key];
+
+                else {
+
+                    path_pts = GB.GetPoints({
+                        path: path.d, density: path.dn,
+                        push: def(path.p, function (r, n, e) {
+
+                            r.push({ x: (-n.x + 526) / path.s, y: 0.0, z: (n.y - 526) / path.s });
+                            if (e) { return r; }
+
+                        }), pointLength: path.c, inLine: path.l
+                    });
+
+
+                    if (path.d2 != "empty") {
+
+                        var pathd2 = GB.GetPoints({
+                            path: path.d2,
+                            push: def(path.p, function (r, n, e) {
+                                if (e) { return r; }
+                                r.push({ x: (-n.x + 526) / path.s, y: 0.0, z: (n.y - 526) / path.s });
+                            }), pointLength: path.c, inLine: path.l
+                        });
+
+
+                        for (var i_ppt in path_pts) {
+
+                            var endijloop = false;
+                            for (var ij = 0; !endijloop && ij < pathd2.length - 1; ij++) {
+                                if (pathd2[ij].x < path_pts[i_ppt].x && pathd2[0].x > path_pts[i_ppt].x) {
+                                    endijloop = true;
+                                    path_pts[i_ppt].y = (pathd2[ij + 1].z - pathd2[ij].z) *
+                                        ((pathd2[ij + 1].x - pathd2[ij].x) / (path_pts[i_ppt].x - pathd2[ij].z)) + pathd2[ij].z - path_pts[i_ppt].z;
+                                }
+                            }
+
+                        }
+
+                        console.log(path_pts);
+                    }
+
+
+                    GB.cache[key] = path_pts;
+
+                }
+
+                s = path_pts.length;
+
+            }
+
+            var sylc = { i: [], f: [], isCylc: true, std: ind };
+            var std = ind;
+
+            var al = (2. * Math.PI) / (s - 1);
+            var s = path_pts.length;
+            for (var i = 0; i < s; i++) {
+                var al1 = i * al;
+                var pot = { x: 10. * sin(al1), y: 0., z: 10. * cos(al1) };
+
+                if (path && path_pts && path_pts[i])
+                    pot = { x: path_pts[i].x, y: path_pts[i].y, z: path_pts[i].z };
+
+                var pot1 = r_y(pot, def(p.ry, 0.) * Math.PI / 180., def(p.ce, { x: 0, y: 0, z: 0 }));
+                var pot2 = r_x(pot1, def(p.rx, 0.) * Math.PI / 180., def(p.ce, { x: 0, y: 0, z: 0 }));
+                var pot3 = r_z(pot2, def(p.rz, 0.) * Math.PI / 180., def(p.ce, { x: 0, y: 0, z: 0 }));
+
+                pot3.y *= def(p.sy, 1.);
+                pot3.z *= def(p.sz, 1.);
+                pot3.x *= def(p.sx, 1.);
+                pot3.y *= def(p.sa, 1.);
+                pot3.z *= def(p.sa, 1.);
+                pot3.x *= def(p.sa, 1.);
+
+                if (p && p.y && typeof p.y == "function") pot3.y += def(p.y(pot3), 0.); else pot3.y += def(p.y, 0.);
+                if (p && p.x && typeof p.x == "function") pot3.x += def(p.x(pot3), 0.); else pot3.x += def(p.x, 0.);
+                if (p && p.z && typeof p.z == "function") pot3.z += def(p.z(pot3), 0.); else pot3.z += def(p.z, 0.);
+
+
+
+                pot3 = r_y(pot, def(p.mry, 0.) * Math.PI / 180., def(p.mce, { x: 0, y: 0, z: 0 }));
+                pot3 = r_x(pot1, def(p.mrx, 0.) * Math.PI / 180., def(p.mce, { x: 0, y: 0, z: 0 }));
+                pot3 = r_z(pot2, def(p.mrz, 0.) * Math.PI / 180., def(p.mce, { x: 0, y: 0, z: 0 }));
+
+                var u = path.uvv ? path.uvv(i, s, pot3) : i / s;
+                if (u.x)
+                    geo.uvs.push(u.x, u.y);
+                else geo.uvs.push(u, l);
+
+                if (p.lastp) pot3 = p.lastp(pot3, geo.uvs[geo.uvs.length - 1], geo.uvs[geo.uvs.length - 2]);
+
+                pot3.x = -1. * pot3.x;
+
+                GB.PushVertex(geo, pot3);
+                sylc.i[i] = ind;
+                ind++;
+
+
+            }
+
+
+			if(repeat && repeat > 1){
+			 var rep = [BABYLONX.GeometryBuilder.EdgeRef( sylc)];
+			 for(var i = 1;i<repeat;i++){
+			     rep.push( BABYLONX.GeometryBuilder.Edge(geo, l, p, path)[0]);
+			 }
+			 
+			 return rep;
+			}
+			
+            return [BABYLONX.GeometryBuilder.EdgeRef( sylc)];
+
+        };
+ 
+      var ptts = [];
+		
+
+        BABYLONX.GeometryBuilder.InitEdgePaths = function (geo, arr) {
+            var ptts = arr;
+
+
+            GB.cachePath = null; GB.cache = null; var uv_plan = function (i, s, pp) { return { x: (pp.z - 20) * 0.01, y: (pp.y - 20) * 0.01 }; };
+
+            for (var ij = 0; ij < ptts.length; ij++) { lp = ij; ref = 0; ref = cylc(geo, 80, 1., [ref], 0, { rx: 0, sa: 1 }, { s: 1, l: 1, close: 1, c: 10, d: ptts[lp] }); }
+        }
+ 
+  BABYLONX.GeometryBuilder.Connect  = function (geo, s, r , f ) {
+            
+			r = r.r;
+           
+            if (r.length == 1) {
+
+                r = r[0];
+                if (r.step) {
+                    var i = { i: [], f: [], isCylc: true, std: r.std };
+                    for (var j in r.step) { i.i.push(r.r.i[r.step[j]]); }
+                    r = i;
+                }
+
+            } 
+
+            var sylc = { i: [], f: [], isCylc: true, std: ind };
+            var std = ind;
+
+             
+                for (var j in s.step) { sylc.i.push(s.r.i[s.step[j]]); }
+                sylc.std = s.r.std;
+                console.log(JSON.stringify(sylc));
+             
+
+            if (r.isCylc) {
+                var p1 = [];
+                for (var i = 0; i < sylc.i.length; i++) {
+                    p1.push(sylc.i[i]);
+                }
+                var hlp = process(p1, r.i);
+
+                for (var i = 0; i < hlp.p1.length - 1; i++) {
+                    GB.MakeFace(geo, [p1[hlp.p1[i]], r.i[hlp.p2[i]], p1[hlp.p1[i + 1]], r.i[hlp.p2[i + 1]]], { flip: f, faceUVMap: "0123" });
+                    sylc.f[geo.faces.length];
+                } 
+                
+            }
+ 
+        };
+       
+        var cylc =
+            BABYLONX.GeometryBuilder.AttachEdge;
+        var ind = 0;
+
+
  
