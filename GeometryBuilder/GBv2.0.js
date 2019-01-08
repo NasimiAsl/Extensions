@@ -2249,6 +2249,13 @@ function cross(v, u) {
     };
 
 })(this);
+ var process = function (pts1, pts2) {
+            var n = pts1.length; var m = pts2.length; var r = max(n, m);
+            var fy = function (i, n) { var f = function (ix) { return ceil((ix + 1) * (n / r)) - 1; }; var f2 = function (ix) { return ceil(ix * (n / r)); }; var fn = f(n); if (fn <= n) return f2(i); else f(i); };
+            var p = { p1: [], p2: [] };
+            for (var i = 1; i <= r; i++) { p.p1.push(fy(i, n) - 1); p.p2.push(fy(i, m) - 1); }
+            return p;
+        };
 
 var GB = BABYLONX.GeometryBuilder;
 
@@ -2452,8 +2459,6 @@ var GB = BABYLONX.GeometryBuilder;
  
         };
        
-        var cylc =
-            BABYLONX.GeometryBuilder.AttachEdge;
         var ind = 0;
 
 
