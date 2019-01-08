@@ -2409,7 +2409,7 @@ var GB = BABYLONX.GeometryBuilder;
 
             GB.cachePath = null; GB.cache = null; var uv_plan = function (i, s, pp) { return { x: (pp.z - 20) * 0.01, y: (pp.y - 20) * 0.01 }; };
 
-            for (var ij = 0; ij < ptts.length; ij++) { lp = ij; ref = 0; ref = cylc(geo, 80, 1., [ref], 0, { rx: 0, sa: 1 }, { s: 1, l: 1, close: 1, c: 10, d: ptts[lp] }); }
+            for (var ij = 0; ij < ptts.length; ij++) { lp = ij; ref = 0; ref = BABYLONX.GeometryBuilder.Edge(geo,  1. , { rx: 0, sa: 1 }, { s: 1, l: 1, close: 1, c: 10, d: ptts[lp] }); }
         }
  
   BABYLONX.GeometryBuilder.Connect  = function (geo, s, r , f ) {
