@@ -2250,6 +2250,7 @@ function cross(v, u) {
 
 })(this);
 
+var GB = BABYLONX.GeometryBuilder;
 
 
 		 BABYLONX.GeometryBuilder.EdgeRef = function (  ref) {
