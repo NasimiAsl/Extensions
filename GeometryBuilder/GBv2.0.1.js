@@ -1312,7 +1312,7 @@ var BABYLONX;
             return (p.x || p.x == 0.0);
         };
         GeometryBuilder.PushVertex = function (geo, p1, uv) {
-            if (uv)
+            if (!uv)
                 uv = { u: 0., v: 0. };
             geo.vertices.push({ x: p1.x, y: p1.y, z: p1.z });
             geo.positions.push(p1.x, p1.y, p1.z);
@@ -2382,7 +2382,7 @@ var GB = BABYLONX.GeometryBuilder;
                     geo.uvs.push(u.x, u.y);
                 else geo.uvs.push(u, l);
 
-                if (p.lastp) pot3 = p.lastp(pot3, geo.uvs[geo.uvs.length - 1], geo.uvs[geo.uvs.length - 2]);
+                if (p.custom) pot3 = p.custom(pot3, geo.uvs[geo.uvs.length - 1], geo.uvs[geo.uvs.length - 2]);
 
                 pot3.x = -1. * pot3.x;
 
