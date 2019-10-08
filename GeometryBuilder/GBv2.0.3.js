@@ -368,13 +368,18 @@ var BABYLONX;
                 this.Vertex.push(sresult);
                 this.Fragment.push(sresult);
             }
+	
+		this.Fragment.push(this.VertexBeforeMain);           
             this.Vertex.push("void main(void) { \n\
     " + ShaderMaterialHelperStatics.Position + " = " + ShaderMaterialHelperStatics.AttrPosition + "; \n\
     " + ShaderMaterialHelperStatics.Normal + " = " + ShaderMaterialHelperStatics.AttrNormal + "; \n\
     vec4 result = vec4(" + ShaderMaterialHelperStatics.Position + ",1.);  \n\
+     vec4 wresult = vec4(0.);  \n\
       vuv = uv;\n\
      #[Source]\n\
-    gl_Position = worldViewProjection * result;\n\
+    if(wresult.x != 0 || wresult.y != 0. || wresult.z !=0.)\n\
+			      gl_Position =wresult;\n\
+    else gl_Position = worldViewProjection * result;\n\
     #[AfterFinishVertex] \n\
  }");
             // start Build Fragment Frame 
