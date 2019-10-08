@@ -377,7 +377,7 @@ var BABYLONX;
      vec4 wresult = vec4(0.);  \n\
       vuv = uv;\n\
      #[Source]\n\
-    if(wresult.x != 0 || wresult.y != 0. || wresult.z !=0.)\n\
+    if(wresult.x != 0.0 || wresult.y != 0. || wresult.z !=0.)\n\
 			      gl_Position =wresult;\n\
     else gl_Position = worldViewProjection * result;\n\
     #[AfterFinishVertex] \n\
