@@ -2471,4 +2471,111 @@ var GB = BABYLONX.GeometryBuilder;
         var ind = 0;
 
 
+
+     var mix = function (a,b ,n) {  
+ 
+	if(n ){
+ for (var bi in b) { 
+          
+      eval(' a.' + bi + '=def(b.' + bi + ',a.' + bi + ');'); 
+
+       } 
+ 
+}
+else{
+        for (var bi in b) { 
+          
+      eval('if(a.' + bi + '!= null && a.' + bi + '!= undefined)a.' + bi + '=def(b.' + bi + ',a.' + bi + ');'); 
+
+       } 
+  
+}
+
+      return a; 
+    };
+
+   
+  BABYLONX.GeometryBuilder.Part = function(setting,external){
+          this.Setting = def( setting,{}); 
+          this.ExternalPush =external;
+    };
+
+   
+
+  BABYLONX.GeometryBuilder.Part.prototype = {
+         Creator : function(setting){},
+   
+      Create : function(fn){ this.Creator = fn; return this;  },
+       
+  New : function(setting,custom,param){
+	var th = this;
+	if(custom)		
+		this.Creator(mix(setting,th.Setting),
+			function(p){return custom(th.PushVertex(p,mix(setting,th.Setting)),mix(setting,th.Setting),param);});
+	else 
+		this.Creator(mix(setting,this.Setting),this.PushVertex); return this;},
+    
+    PushVertex: function(p){ return p;},
+       
+
+  ExternalPush: function(p){ return p;},
+         Custom : function(fn){ this.PushVertex = fn; return this;},
+         Setting : {}
+     };
+	 
+	 
+	 
+	 
+	 
+	     BABYLONX.GeometryBuilder.Rims = function(){
+      ind = 0; 
+	  this.edgs = new Array();
+	  this.Rims_Points = new Array();
+	  this.Rim_Index = 0;
+      return this;
+    };
+
+    BABYLONX.GeometryBuilder.Rims.prototype = {
+      edgs:null, 
+      Rim_Index :0,
+       Rims_Points: null,
+       Rim_Custom : function(p){ return p;},
+       Custom : function(fun){ var th = this;this.Rim_Custom = fun; return th;},
+       PushRim : function(geo,count,point,u,repeat,notEnd){
+          var th = this; 
+              
+         repeat = def(repeat,1);
+         u = def(u,0.);
+        
+         if(!th.Rims_Points[th.Rim_Index]) th.Rims_Points[th.Rim_Index] = [];
+          if(count.length) th.Rims_Points[th.Rim_Index] = count;
+          else if(count>0){ 
+             for(var i = 0;i< count;i++){ 
+                th.Rims_Points[th.Rim_Index].push(th.Rim_Custom(point({x:0,y:0,z:0} ,i ,th.Rim_Index ,  i/count)));
+             }
+          }
+          if(!notEnd)
+          {
+             th.edgs[th.Rim_Index] = GB.Edge( geo ,  u  ,{  } , {points:th.Rims_Points[th.Rim_Index]},repeat);
+             th.Rim_Index++; 
+          }
+
+          return th;
+       },
+       Connect : function(geo,a,b,f,c,d){ 
+           var th = this;
+           if(th.Rim_Index > 1){
+           a = def(a,th.Rim_Index-1);
+           b = def(b,th.Rim_Index-2);
+           c = def(c,0);
+           d = def(d,0);
+
+            GB.Connect( geo,th.edgs[a][c], th.edgs[b][d],f);  
+           }
+           return th; 
+       }
+
+    };
+ 
+  
  
