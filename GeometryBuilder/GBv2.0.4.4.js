@@ -2795,4 +2795,99 @@ function setUvMap(s){
 	
  
   
+function p_ts(p,ts){
+	
+	  var _ts = def(ts ,{});
+        p.x *= def(_ts.sx,1.0);
+        p.y *= def(_ts.sy,1.0);
+        p.z *= def(_ts.sz,1.0);
+        p.x *= def(_ts.sa,1.0);
+        p.y *= def(_ts.sa,1.0);
+        p.z *= def(_ts.sa,1.0);
+
+        _ts.rt = def(_ts.rt,'xyz'); 
+        for(var k=0;k<3;k++){
+            if(_ts.rt[k] == 'x')
+            p = r_x(p,def(_ts.rx,0),def(_ts.ce,{x:0,y:0,z:0}));
+            else if(_ts.rt[k] == 'y')
+            p = r_y(p,def(_ts.ry,0),def(_ts.ce,{x:0,y:0,z:0}));
+            else if(_ts.rt[k] == 'z')
+            p = r_z(p,def(_ts.rz,0),def(_ts.ce,{x:0,y:0,z:0}));
+        }        
+
+        p.x += def(_ts.mx,0.0);
+        p.y += def(_ts.my,0.0);
+        p.z += def(_ts.mz,0.0);  
+
+        _ts.rt2 = def(_ts.rt2,'xyz'); 
+        for(var k=0;k<3;k++){
+            if(_ts.rt2[k] == 'x')
+            p = r_x(p,def(_ts.rx2,0),def(_ts.ce2,{x:0,y:0,z:0}));
+            else if(_ts.rt2[k] == 'y')
+            p = r_y(p,def(_ts.ry2,0),def(_ts.ce2,{x:0,y:0,z:0}));
+            else if(_ts.rt2[k] == 'z')
+            p = r_z(p,def(_ts.rz2,0),def(_ts.ce2,{x:0,y:0,z:0}));
+        }  
+
+        return p;
+}
+  
+  
+  function r_la_spPCAD(p,s,e,y,sp) { 
+
+    var tar =  {
+            x:e.x - s.x,
+            y:e.y - s.y,
+            z:e.z - s.z  
+            };
+
+        if(tar.x ==0 && tar.z == 0 ) { 
+        
+         p = r_y(p,def(y,0)); 
+
+        if(tar.y>0)
+        {
+         p = r_x(p,180.*deg);
+         p = r_y(p,180.*deg);  
+        } 
+
+         p.x += sp.x;
+         p.y += sp.y;
+         p.z += sp.z;
+
+        return p;
+    }
+
+    if(tar.x == 0 ) tar.x += 0.000001;
+    if(tar.y == 0 ) tar.y += 0.000001;
+    if(tar.z == 0 ) tar.z += 0.000001;
+
+    var t1 = { x: -tar.x, y: tar.y, z: tar.z };
+    var t2 = { x: -tar.x, y: tar.y, z: tar.z };
+
+    t1 = (t1);
+    
+    var a = atan(t1.x / t1.z);
+
+    t2 = (r_y(t2, a));
+    var b = atan(t2.z / t2.y);
+
+    p = r_x(p, (tar.y>0?-1:1)*90 * deg);
+     
+      var ang1 = 0,ang2 = 0,ang3 = 0;
+      ang1 =  -1 * (90 * deg - b);
+      ang2 = -a; 
+   
+        p = r_x(p,ang1);
+        p = r_y(p,ang2);  
+
+      p.x += -sp.x ;
+      p.y += sp.y ;
+      p.z += sp.z ;
+
+    return p; 
+}
+
+
+
  
